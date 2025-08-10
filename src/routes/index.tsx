@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { FC, ReactNode, useMemo } from "react";
-import { decompress } from "../utils";
-import { GameState } from "../types";
+import { FC, ReactNode } from "react";
+import { useHistoryGames } from "../effects/useHistoryGames";
 
 const HomePrimaryButton: FC<{
 	children: ReactNode;
@@ -28,42 +27,7 @@ const HomePrimaryButton: FC<{
 };
 
 const RecentGamesSection: FC = () => {
-	const recentGames = useMemo(() => {
-		const games: Array<{
-			id: string;
-			players: string[];
-			date: string;
-			totalGames: number;
-		}> = [];
-		for (let i = 0; i < localStorage.length; i++) {
-			const key = localStorage.key(i);
-			if (key?.startsWith("game-")) {
-				try {
-					const data = localStorage.getItem(key);
-					if (data) {
-						const gameState: GameState = decompress(data);
-						games.push({
-							id: gameState.meta.id,
-							players: gameState.players,
-							date: new Date(
-								gameState.meta.date,
-							).toLocaleDateString("lv-LV"),
-							totalGames: gameState.games?.length || 0,
-						});
-					}
-				} catch (error) {
-					console.warn(`Failed to parse saved game ${key}:`, error);
-				}
-			}
-		}
-		return games
-			.sort(
-				(a, b) =>
-					new Date(b.date).getTime() - new Date(a.date).getTime(),
-			)
-			.slice(0, 3);
-	}, []);
-
+	const recentGames = useHistoryGames();
 	if (recentGames.length === 0) {
 		return null;
 	}
@@ -98,7 +62,7 @@ const RecentGamesSection: FC = () => {
 			<div className="space-y-3">
 				{recentGames.map((game) => (
 					<div
-						key={game.id}
+						key={game.meta.id}
 						className="flex items-center justify-between rounded-lg bg-white/10 p-3"
 					>
 						<div>
@@ -106,22 +70,19 @@ const RecentGamesSection: FC = () => {
 								{game.players.join(", ")}
 							</div>
 							<div className="text-sm text-emerald-200">
-								{game.date} • {game.totalGames} spēles
+								{new Date(game.meta.date).toLocaleDateString(
+									"lv-LV",
+								)}
+								• {game.games?.length ?? 0} spēles
 							</div>
 						</div>
-						<button
-							onClick={() => {
-								const gameData = localStorage.getItem(
-									`game-${game.id}`,
-								);
-								if (gameData) {
-									window.location.href = `#/game/${encodeURIComponent(gameData)}`;
-								}
-							}}
+						<Link
+							to="/game/$data"
+							params={{ data: game }}
 							className="rounded-lg bg-emerald-600 px-3 py-1 text-sm text-white transition-colors hover:bg-emerald-700"
 						>
 							Turpināt
-						</button>
+						</Link>
 					</div>
 				))}
 			</div>
@@ -155,8 +116,8 @@ const Index: FC = () => {
 					</a>
 				</div> */}
 			</div>
-			{/* 
-			<RecentGamesSection /> */}
+
+			<RecentGamesSection />
 		</div>
 	);
 };
