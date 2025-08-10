@@ -62,23 +62,21 @@ const RecentGamesSection: FC = () => {
 			<div className="space-y-3">
 				{recentGames.map((game) => (
 					<div
-						key={game.meta.id}
+						key={game.state.meta.id}
 						className="flex items-center justify-between rounded-lg bg-white/10 p-3"
 					>
 						<div>
 							<div className="font-medium text-white">
-								{game.players.join(", ")}
+								{game.state.players.join(", ")}
 							</div>
 							<div className="text-sm text-emerald-200">
-								{new Date(game.meta.date).toLocaleDateString(
-									"lv-LV",
-								)}
-								• {game.games?.length ?? 0} spēles
+								{game.date.toLocaleDateString("lv-LV")}•{" "}
+								{game.state.games?.length ?? 0} spēles
 							</div>
 						</div>
 						<Link
 							to="/game/$data"
-							params={{ data: game }}
+							params={{ data: game.state }}
 							className="rounded-lg bg-emerald-600 px-3 py-1 text-sm text-white transition-colors hover:bg-emerald-700"
 						>
 							Turpināt

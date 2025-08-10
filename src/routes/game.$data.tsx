@@ -144,7 +144,7 @@ const RouteComponent: FC = () => {
 	);
 	const gameResultZaudejaGaldinu = useCallback(
 		(gameType: GameTypeGaldins, player: number) => {
-			const game: Game = [...gameType, player];
+			const game: Game = [...gameType, player, new Date().toISOString()];
 			return navigate({
 				...state,
 				games: [...state.games, game],
@@ -156,7 +156,7 @@ const RouteComponent: FC = () => {
 	);
 	const gameResultMazaZole = useCallback(
 		(gameType: GameTypeMazaZole, result: boolean) => {
-			const game: Game = [...gameType, +result];
+			const game: Game = [...gameType, +result, new Date().toISOString()];
 			return navigate({
 				...state,
 				games: [...state.games, game],
@@ -171,7 +171,7 @@ const RouteComponent: FC = () => {
 			gameType: GameTypeZole | GameTypeLielais,
 			result: ZoleWinResult | ZoleLoseResult,
 		) => {
-			const game: Game = [...gameType, result];
+			const game: Game = [...gameType, result, new Date().toISOString()];
 			return navigate({
 				...state,
 				games: [...state.games, game],

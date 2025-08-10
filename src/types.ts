@@ -42,15 +42,25 @@ export type Game =
 	| GameTypeZoleResult
 	| GameTypeLielaisResult;
 export type GameWithScore = { game: Game; scores: number[]; diff: number[] };
-export type GameTypeGaldinsResult = [...GameTypeGaldins, loser: number];
-export type GameTypeMazaZoleResult = [...GameTypeMazaZole, result: number];
+export type GameTypeGaldinsResult = [
+	...GameTypeGaldins,
+	loser: number,
+	date: string,
+];
+export type GameTypeMazaZoleResult = [
+	...GameTypeMazaZole,
+	result: number,
+	date: string,
+];
 export type GameTypeZoleResult = [
 	...GameTypeZole,
 	result: ZoleWinResult | ZoleLoseResult,
+	date: string,
 ];
 export type GameTypeLielaisResult = [
 	...GameTypeLielais,
 	result: ZoleWinResult | ZoleLoseResult,
+	date: string,
 ];
 
 export const enum ZoleWinResult {
