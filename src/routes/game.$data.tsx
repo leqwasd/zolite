@@ -31,6 +31,7 @@ import { FlexLayout } from "../components/FlexLayout";
 import { TotalsTable } from "../components/TotalsTable";
 import { GameTypeDisplay } from "../components/GameTypeDisplay";
 import { PanelLight } from "../components/Panels/PanelLight";
+import { twMerge } from "tailwind-merge";
 const variantClasses = new Map<GameTypeEnum, string>([
 	[
 		GameTypeEnum.Galdins,
@@ -358,8 +359,25 @@ const CurrentGamePlayer: FC<{
 	preGameActions,
 	game,
 }) => {
+	const shouldGivePreGameAction =
+		game == null &&
+		shouldGiveAction(
+			currentDealer,
+			preGameActions,
+			playerCount,
+			playerIndex,
+		);
+	const shouldGiveGameAction =
+		game != null && isPlayerInGame(currentDealer, playerCount, playerIndex);
+
+	const shouldFlex = shouldGivePreGameAction || shouldGiveGameAction;
 	return (
-		<PanelLight className="flex min-h-[200px] flex-1 flex-col gap-2">
+		<PanelLight
+			className={twMerge(
+				"flex min-h-[200px] flex-col gap-2 transition-[flex-grow]",
+				shouldFlex ? "flex-2" : "flex-1",
+			)}
+		>
 			<div className="text-center text-lg font-semibold text-white">
 				{player}
 			</div>
@@ -369,21 +387,10 @@ const CurrentGamePlayer: FC<{
 				playerIndex={playerIndex}
 			/>
 
-			{game == null &&
-				shouldGiveAction(
-					currentDealer,
-					preGameActions,
-					playerCount,
-					playerIndex,
-				) && <PreGameActions player={playerIndex} />}
+			{shouldGivePreGameAction && <PreGameActions player={playerIndex} />}
 
-			{game != null && (
-				<GameActions
-					game={game}
-					playerIndex={playerIndex}
-					playerCount={playerCount}
-					currentDealer={currentDealer}
-				/>
+			{shouldGiveGameAction && (
+				<GameActions game={game} playerIndex={playerIndex} />
 			)}
 		</PanelLight>
 	);
@@ -455,20 +462,7 @@ const PreGameActions: FC<{ player: number }> = ({ player }) => {
 const GameActions: FC<{
 	game: GameType;
 	playerIndex: number;
-	playerCount: number;
-	currentDealer: number;
-}> = ({ game, playerIndex, playerCount, currentDealer }) => {
-	const isPlayerOutsideGame = !isPlayerInGame(
-		currentDealer,
-		playerCount,
-		playerIndex,
-	);
-	if (isPlayerOutsideGame) {
-		// Player is not in the game, no result to show
-		return null;
-	} else {
-		console.log("?");
-	}
+}> = ({ game, playerIndex }) => {
 	switch (game[0]) {
 		case GameTypeEnum.Galdins:
 			return <GameActionsGaldins game={game} playerIndex={playerIndex} />;
