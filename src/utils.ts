@@ -31,14 +31,11 @@ export function getRoka(
 
 export function shouldGiveAction(
 	currentDealer: number,
-	preGameActionsLength: number,
+	preGameActions: number,
 	playerCount: number,
 	playerIndex: number,
 ): boolean {
-	return (
-		getRoka(currentDealer, playerCount, playerIndex) ===
-		preGameActionsLength
-	);
+	return getRoka(currentDealer, playerCount, playerIndex) === preGameActions;
 }
 
 export function isPlayerInGame(

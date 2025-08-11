@@ -86,7 +86,7 @@ function useGameStateInContext(): Required<GameState> {
 		() => ({
 			...data,
 			games: data.games ?? [],
-			preGameActions: data.preGameActions ?? [],
+			preGameActions: data.preGameActions ?? 0,
 			gameType: data.gameType ?? null,
 		}),
 		[data],
@@ -124,7 +124,7 @@ const RouteComponent: FC = () => {
 	const setGamestateAction = useCallback(
 		(action: GameTypeEnum, player: number) => {
 			if (action === GameTypeEnum.Galdins) {
-				if (state.preGameActions.length === 2) {
+				if (state.preGameActions === 2) {
 					return navigate({
 						...state,
 						gameType: [GameTypeEnum.Galdins],
@@ -132,7 +132,7 @@ const RouteComponent: FC = () => {
 				} else {
 					return navigate({
 						...state,
-						preGameActions: state.preGameActions.concat(action),
+						preGameActions: state.preGameActions + 1,
 					});
 				}
 			}
@@ -140,16 +140,6 @@ const RouteComponent: FC = () => {
 				...state,
 				gameType: [action, player],
 			});
-			// const currentDealer =
-			// 	(state.dealer + state.games.length) % state.players.length;
-			// return navigate({
-			// 	...state,
-			// 	gameType: [
-			// 		action,
-			// 		(currentDealer + state.preGameActions.length + 1) %
-			// 			state.players.length,
-			// 	],
-			// });
 		},
 		[navigate, state],
 	);
@@ -160,7 +150,7 @@ const RouteComponent: FC = () => {
 				...state,
 				games: [...state.games, game],
 				gameType: null,
-				preGameActions: [],
+				preGameActions: 0,
 			});
 		},
 		[navigate, state],
@@ -172,7 +162,7 @@ const RouteComponent: FC = () => {
 				...state,
 				games: [...state.games, game],
 				gameType: null,
-				preGameActions: [],
+				preGameActions: 0,
 			});
 		},
 		[navigate, state],
@@ -187,7 +177,7 @@ const RouteComponent: FC = () => {
 				...state,
 				games: [...state.games, game],
 				gameType: null,
-				preGameActions: [],
+				preGameActions: 0,
 			});
 		},
 		[navigate, state],
@@ -358,7 +348,7 @@ const CurrentGamePlayer: FC<{
 	playerIndex: number;
 	currentDealer: number;
 	playerCount: number;
-	preGameActions: GameTypeEnum[];
+	preGameActions: number;
 	game: GameType | null;
 }> = ({
 	player,
@@ -382,7 +372,7 @@ const CurrentGamePlayer: FC<{
 			{game == null &&
 				shouldGiveAction(
 					currentDealer,
-					preGameActions.length,
+					preGameActions,
 					playerCount,
 					playerIndex,
 				) && <PreGameActions player={playerIndex} />}
