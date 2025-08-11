@@ -7,7 +7,13 @@ import {
 	useContext,
 	useMemo,
 } from "react";
-import { decompress, compress } from "../utils";
+import {
+	decompress,
+	compress,
+	shouldGiveAction,
+	isPlayerInGame,
+	getRoka,
+} from "../utils";
 import {
 	Game,
 	GameState,
@@ -43,6 +49,7 @@ const variantClasses = new Map<GameTypeEnum, string>([
 		"hover:bg-blue-400/20 bg-blue-400/10 text-white border-blue-500 hover:border-blue-400",
 	],
 ]);
+
 // Button Components
 const ActionButton: FC<
 	PropsWithChildren<{
@@ -65,7 +72,7 @@ const GameContext = createContext({} as GameContext);
 type GameContext = {
 	state: Required<GameState>;
 	gamesWithScore: GameWithScore[];
-	setGamestateAction(action: GameTypeEnum): void;
+	setGamestateAction(action: GameTypeEnum, player: number): void;
 	gameResultZaudejaGaldinu(gameType: GameTypeGaldins, player: number): void;
 	gameResultMazaZole(gameType: GameTypeMazaZole, result: boolean): void;
 	gameResultLielais(
@@ -115,7 +122,7 @@ const RouteComponent: FC = () => {
 	}, [state]);
 	const navigate = useNavigateGame();
 	const setGamestateAction = useCallback(
-		(action: GameTypeEnum) => {
+		(action: GameTypeEnum, player: number) => {
 			if (action === GameTypeEnum.Galdins) {
 				if (state.preGameActions.length === 2) {
 					return navigate({
@@ -129,16 +136,20 @@ const RouteComponent: FC = () => {
 					});
 				}
 			}
-			const currentDealer =
-				(state.dealer + state.games.length) % state.players.length;
 			return navigate({
 				...state,
-				gameType: [
-					action,
-					(currentDealer + state.preGameActions.length + 1) %
-						state.players.length,
-				],
+				gameType: [action, player],
 			});
+			// const currentDealer =
+			// 	(state.dealer + state.games.length) % state.players.length;
+			// return navigate({
+			// 	...state,
+			// 	gameType: [
+			// 		action,
+			// 		(currentDealer + state.preGameActions.length + 1) %
+			// 			state.players.length,
+			// 	],
+			// });
 		},
 		[navigate, state],
 	);
@@ -357,11 +368,6 @@ const CurrentGamePlayer: FC<{
 	preGameActions,
 	game,
 }) => {
-	const shouldGiveAction =
-		game == null &&
-		(currentDealer + preGameActions.length + 1) % playerCount ===
-			playerIndex;
-
 	return (
 		<PanelLight className="flex min-h-[200px] flex-1 flex-col gap-2">
 			<div className="text-center text-lg font-semibold text-white">
@@ -373,7 +379,13 @@ const CurrentGamePlayer: FC<{
 				playerIndex={playerIndex}
 			/>
 
-			{shouldGiveAction && <PreGameActions />}
+			{game == null &&
+				shouldGiveAction(
+					currentDealer,
+					preGameActions.length,
+					playerCount,
+					playerIndex,
+				) && <PreGameActions player={playerIndex} />}
 
 			{game != null && (
 				<GameActions
@@ -387,58 +399,62 @@ const CurrentGamePlayer: FC<{
 	);
 };
 
+function useRoka(
+	currentDealer: number,
+	playerCount: number,
+	playerIndex: number,
+) {
+	const roka = getRoka(currentDealer, playerCount, playerIndex);
+	if (roka == null) {
+		return null;
+	}
+	return `${roka + 1}. roka`;
+}
+
 const Roka: FC<{
 	currentDealer: number;
 	playerCount: number;
 	playerIndex: number;
 }> = ({ currentDealer, playerCount, playerIndex }) => {
-	let text: string | null =
-		currentDealer === playerIndex ? "(Dalītājs) " : "";
-	if ((currentDealer + 1) % playerCount === playerIndex) {
-		text += "1. roka";
-	} else if ((currentDealer + 2) % playerCount === playerIndex) {
-		text += "2. roka";
-	} else if ((currentDealer + 3) % playerCount === playerIndex) {
-		text += "3. roka";
-	}
-	if (text == "") {
-		return null;
-	}
+	const dealer = currentDealer === playerIndex ? "(Dalītājs)" : null;
+	const text = useRoka(currentDealer, playerCount, playerIndex);
 	return (
 		<div
 			className="text-center text-sm text-emerald-200"
 			data-component="Roka"
 		>
-			{text}
+			{dealer} {text}
 		</div>
 	);
 };
 
-const PreGameActions: FC = () => {
+const PreGameActions: FC<{ player: number }> = ({ player }) => {
 	const { setGamestateAction } = useGameContext();
 	return (
 		<div className="flex flex-col gap-2" data-component="Actions">
 			<ActionButton
 				gameType={GameTypeEnum.Galdins}
-				onClick={() => setGamestateAction(GameTypeEnum.Galdins)}
+				onClick={() => setGamestateAction(GameTypeEnum.Galdins, player)}
 			>
 				Garām
 			</ActionButton>
 			<ActionButton
 				gameType={GameTypeEnum.Lielais}
-				onClick={() => setGamestateAction(GameTypeEnum.Lielais)}
+				onClick={() => setGamestateAction(GameTypeEnum.Lielais, player)}
 			>
 				Lielais
 			</ActionButton>
 			<ActionButton
 				gameType={GameTypeEnum.Zole}
-				onClick={() => setGamestateAction(GameTypeEnum.Zole)}
+				onClick={() => setGamestateAction(GameTypeEnum.Zole, player)}
 			>
 				Zole
 			</ActionButton>
 			<ActionButton
 				gameType={GameTypeEnum.MazaZole}
-				onClick={() => setGamestateAction(GameTypeEnum.MazaZole)}
+				onClick={() =>
+					setGamestateAction(GameTypeEnum.MazaZole, player)
+				}
 			>
 				Mazā zole
 			</ActionButton>
@@ -452,11 +468,16 @@ const GameActions: FC<{
 	playerCount: number;
 	currentDealer: number;
 }> = ({ game, playerIndex, playerCount, currentDealer }) => {
-	const isPlayerOutsideGame =
-		playerCount === 4 && playerIndex === currentDealer;
+	const isPlayerOutsideGame = !isPlayerInGame(
+		currentDealer,
+		playerCount,
+		playerIndex,
+	);
 	if (isPlayerOutsideGame) {
 		// Player is not in the game, no result to show
 		return null;
+	} else {
+		console.log("?");
 	}
 	switch (game[0]) {
 		case GameTypeEnum.Galdins:

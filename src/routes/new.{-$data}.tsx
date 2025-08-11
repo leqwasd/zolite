@@ -20,7 +20,7 @@ const SetupPageLayout: FC<{ children: ReactNode; title: string }> = ({
 		<h1 className="mb-8 text-center text-3xl font-bold text-white drop-shadow-lg">
 			{title}
 		</h1>
-		<div className="w-full max-w-md">{children}</div>
+		<div className="w-full">{children}</div>
 	</div>
 );
 
@@ -85,6 +85,7 @@ const PlayerCountPage: FC = () => {
 			<FlexLayout className="gap-4">
 				<SetupButton data={[3]}>3</SetupButton>
 				<SetupButton data={[4]}>4</SetupButton>
+				<SetupButton data={[5]}>5</SetupButton>
 			</FlexLayout>
 		</SetupPageLayout>
 	);
