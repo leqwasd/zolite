@@ -34,6 +34,7 @@ import { TotalsTable } from "../components/TotalsTable";
 import { GameTypeDisplay } from "../components/GameTypeDisplay";
 import { PanelLight } from "../components/Panels/PanelLight";
 import { twMerge } from "tailwind-merge";
+import { getPointsForGameForPlayer } from "../points";
 const variantClasses = new Map<GameTypeEnum, string>([
 	[
 		GameTypeEnum.Galdins,
@@ -121,10 +122,15 @@ const RouteComponent: FC = () => {
 	const state = useGameStateInContext();
 	const gamesWithScore = useMemo(() => {
 		const results: GameWithScore[] = [];
-		let previousScores = new Array(state.players.length).fill(0);
+		let previousScores: number[] = null!;
 		for (const game of state.games) {
-			results.push(withScore(game, previousScores, state.players));
-			previousScores = results[results.length - 1].scores;
+			const gameWithScore = withScore(
+				game,
+				previousScores ?? new Array(state.players.length).fill(0),
+				state.players,
+			);
+			results.push(gameWithScore);
+			previousScores = gameWithScore.scores;
 		}
 		return results;
 	}, [state]);
@@ -248,110 +254,6 @@ function withScore(
 		scores,
 	};
 }
-function getPointsForGameForPlayer(
-	game: Game,
-	player: number,
-	playerCount: number,
-) {
-	const modifier = playerCount - 1;
-	switch (game[0]) {
-		case GameTypeEnum.Galdins:
-			if (game[1] == player) {
-				return PointTable.GaldinsLosePerPlayer * modifier;
-			} else {
-				return -PointTable.GaldinsLosePerPlayer;
-			}
-		case GameTypeEnum.MazaZole:
-			if (game[2]) {
-				if (game[1] === player) {
-					return PointTable.MazaZoleWinPerPlayer * modifier;
-				} else {
-					return -PointTable.MazaZoleWinPerPlayer;
-				}
-			} else {
-				if (game[1] === player) {
-					return PointTable.MazaZoleLossPerPlayer * modifier;
-				} else {
-					return -PointTable.MazaZoleLossPerPlayer;
-				}
-			}
-		case GameTypeEnum.Lielais:
-			switch (game[2]) {
-				case ZoleWinResult.win61:
-					return player === game[1]
-						? PointTable.LielaisWin * modifier
-						: -PointTable.LielaisWin;
-				case ZoleWinResult.win91:
-					return player === game[1]
-						? PointTable.LielaisWinJanos * modifier
-						: -PointTable.LielaisWinJanos;
-				case ZoleWinResult.winAll:
-					return player === game[1]
-						? PointTable.LielaisWinBezstiki * modifier
-						: -PointTable.LielaisWinBezstiki;
-				case ZoleLoseResult.lost60:
-					return player === game[1]
-						? PointTable.LielaisLost * modifier
-						: -PointTable.LielaisLost;
-				case ZoleLoseResult.lost30:
-					return player === game[1]
-						? PointTable.LielaisLostJanos * modifier
-						: -PointTable.LielaisLostJanos;
-				case ZoleLoseResult.lostAll:
-					return player === game[1]
-						? PointTable.LielaisLostBezstiki * modifier
-						: -PointTable.LielaisLostBezstiki;
-				default:
-					return 0;
-			}
-		case GameTypeEnum.Zole:
-			switch (game[2]) {
-				case ZoleWinResult.win61:
-					return player === game[1]
-						? PointTable.ZoleWin * modifier
-						: -PointTable.ZoleWin;
-				case ZoleWinResult.win91:
-					return player === game[1]
-						? PointTable.ZoleWinJanos * modifier
-						: -PointTable.ZoleWinJanos;
-				case ZoleWinResult.winAll:
-					return player === game[1]
-						? PointTable.ZoleWinBezstiki * modifier
-						: -PointTable.ZoleWinBezstiki;
-				case ZoleLoseResult.lost60:
-					return player === game[1]
-						? PointTable.ZoleLost * modifier
-						: -PointTable.ZoleLost;
-				case ZoleLoseResult.lost30:
-					return player === game[1]
-						? PointTable.ZoleLostJanos * modifier
-						: -PointTable.ZoleLostJanos;
-				case ZoleLoseResult.lostAll:
-					return player === game[1]
-						? PointTable.ZoleLostBezstiki * modifier
-						: -PointTable.ZoleLostBezstiki;
-				default:
-					return 0;
-			}
-	}
-}
-const PointTable = {
-	GaldinsLosePerPlayer: -2,
-	MazaZoleWinPerPlayer: 6,
-	MazaZoleLossPerPlayer: -7,
-	LielaisWin: 1,
-	LielaisWinJanos: 2,
-	LielaisWinBezstiki: 3,
-	LielaisLost: -2,
-	LielaisLostJanos: -3,
-	LielaisLostBezstiki: -4,
-	ZoleWin: 5,
-	ZoleWinJanos: 6,
-	ZoleWinBezstiki: 7,
-	ZoleLost: -6,
-	ZoleLostJanos: -7,
-	ZoleLostBezstiki: -8,
-};
 
 const GamePage: FC = () => {
 	const { state, gamesWithScore } = useGameContext();
