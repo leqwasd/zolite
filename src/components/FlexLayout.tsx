@@ -1,11 +1,11 @@
 import { FC, PropsWithChildren } from "react";
 import { twMerge } from "tailwind-merge";
-export const FlexLayout: FC<PropsWithChildren<{ className?: string }>> = ({
-	children,
-	className,
-}) => (
+export const FlexLayout: FC<
+	PropsWithChildren<{ className?: string; id?: string }>
+> = ({ children, className, id }) => (
 	<div
-		className={twMerge("flex flex-col landscape:flex-row gap-2", className)}
+		id={id}
+		className={twMerge("flex flex-col gap-2 landscape:flex-row", className)}
 	>
 		{children}
 	</div>

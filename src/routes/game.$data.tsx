@@ -13,6 +13,8 @@ import {
 	shouldGiveAction,
 	isPlayerInGame,
 	getRoka,
+	findPlayerWithAction,
+	findPlayerWithFirstRoka,
 } from "../utils";
 import {
 	Game,
@@ -99,14 +101,19 @@ function useGameContext(): GameContext {
 function useNavigateGame() {
 	const navigate = Route.useNavigate();
 	return useCallback(
-		(data: GameState) => {
-			navigate({
+		(data: GameState, hash?: string) =>
+			void navigate({
 				to: "/game/$data",
 				params: {
 					data,
 				},
-			});
-		},
+				hash: hash ?? `player-${3}`,
+				hashScrollIntoView: {
+					behavior: "smooth",
+					block: "center",
+					inline: "center",
+				},
+			}),
 		[navigate],
 	);
 }
@@ -126,45 +133,68 @@ const RouteComponent: FC = () => {
 		(action: GameTypeEnum, player: number) => {
 			if (action === GameTypeEnum.Galdins) {
 				if (state.preGameActions === 2) {
-					return navigate({
-						...state,
-						gameType: [GameTypeEnum.Galdins],
-					});
+					return navigate(
+						{
+							...state,
+							preGameActions: 0,
+							gameType: [GameTypeEnum.Galdins],
+						},
+						"players",
+					);
 				} else {
-					return navigate({
-						...state,
-						preGameActions: state.preGameActions + 1,
-					});
+					const currentDealer =
+						(state.dealer + state.games.length) %
+						state.players.length;
+					return navigate(
+						{
+							...state,
+							preGameActions: state.preGameActions + 1,
+						},
+						`player-${findPlayerWithAction(currentDealer, state.preGameActions + 1, state.players.length)}`,
+					);
 				}
 			}
-			return navigate({
-				...state,
-				gameType: [action, player],
-			});
+			return navigate(
+				{
+					...state,
+					gameType: [action, player],
+				},
+				`player-${player}`,
+			);
 		},
 		[navigate, state],
 	);
 	const gameResultZaudejaGaldinu = useCallback(
 		(gameType: GameTypeGaldins, player: number) => {
 			const game: Game = [...gameType, player, new Date().toISOString()];
-			return navigate({
-				...state,
-				games: [...state.games, game],
-				gameType: null,
-				preGameActions: 0,
-			});
+			const nextDealer =
+				(state.dealer + state.games.length + 1) % state.players.length;
+			return navigate(
+				{
+					...state,
+					games: [...state.games, game],
+					gameType: null,
+					preGameActions: 0,
+				},
+				`player-${findPlayerWithFirstRoka(nextDealer, state.players.length)}`,
+			);
 		},
 		[navigate, state],
 	);
 	const gameResultMazaZole = useCallback(
 		(gameType: GameTypeMazaZole, result: boolean) => {
 			const game: Game = [...gameType, +result, new Date().toISOString()];
-			return navigate({
-				...state,
-				games: [...state.games, game],
-				gameType: null,
-				preGameActions: 0,
-			});
+			const nextDealer =
+				(state.dealer + state.games.length + 1) % state.players.length;
+			return navigate(
+				{
+					...state,
+					games: [...state.games, game],
+					gameType: null,
+					preGameActions: 0,
+				},
+				`player-${findPlayerWithFirstRoka(nextDealer, state.players.length)}`,
+			);
 		},
 		[navigate, state],
 	);
@@ -174,12 +204,17 @@ const RouteComponent: FC = () => {
 			result: ZoleWinResult | ZoleLoseResult,
 		) => {
 			const game: Game = [...gameType, result, new Date().toISOString()];
-			return navigate({
-				...state,
-				games: [...state.games, game],
-				gameType: null,
-				preGameActions: 0,
-			});
+			const nextDealer =
+				(state.dealer + state.games.length + 1) % state.players.length;
+			return navigate(
+				{
+					...state,
+					games: [...state.games, game],
+					gameType: null,
+					preGameActions: 0,
+				},
+				`player-${findPlayerWithFirstRoka(nextDealer, state.players.length)}`,
+			);
 		},
 		[navigate, state],
 	);
@@ -327,7 +362,7 @@ const GamePage: FC = () => {
 			<PanelLight>
 				<TotalsTable games={gamesWithScore} players={state.players} />
 			</PanelLight>
-			<FlexLayout className="gap-3">
+			<FlexLayout className="gap-3" id="players">
 				{state.players.map((player, index) => (
 					<CurrentGamePlayer
 						key={index}
@@ -373,6 +408,7 @@ const CurrentGamePlayer: FC<{
 	const shouldFlex = shouldGivePreGameAction || shouldGiveGameAction;
 	return (
 		<PanelLight
+			id={`player-${playerIndex}`}
 			className={twMerge(
 				"flex min-h-[200px] flex-col gap-2 transition-[flex-grow]",
 				shouldFlex ? "flex-2" : "flex-1",

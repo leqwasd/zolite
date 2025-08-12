@@ -45,3 +45,27 @@ export function isPlayerInGame(
 ) {
 	return getRoka(currentDealer, playerCount, playerIndex) !== null;
 }
+
+export function findPlayerWithAction(
+	currentDealer: number,
+	preGameActions: number,
+	playerCount: number,
+) {
+	for (let i = 0; i < playerCount; i++) {
+		if (shouldGiveAction(currentDealer, preGameActions, playerCount, i)) {
+			return i;
+		}
+	}
+	return null;
+}
+export function findPlayerWithFirstRoka(
+	currentDealer: number,
+	playerCount: number,
+) {
+	for (let i = 0; i < playerCount; i++) {
+		if (getRoka(currentDealer, playerCount, i) === 0) {
+			return i;
+		}
+	}
+	return null;
+}
