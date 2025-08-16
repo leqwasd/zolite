@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://leqwasd.github.io/zolite/sitemap.xml
+
+# Allow search engines to index the main pages
+Allow: /zolite/
+Allow: /zolite/new
+Allow: /zolite/history
+Allow: /zolite/game/
+
+# Block any potential admin or development files
+Disallow: /src/
+Disallow: *.map
+Disallow: /node_modules/
