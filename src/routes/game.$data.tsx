@@ -19,37 +19,37 @@ import {
 import {
 	Game,
 	GameState,
-	GameType,
-	GameTypeEnum,
-	GameTypeGaldins,
-	GameTypeLielais,
-	GameTypeMazaZole,
-	GameTypeZole,
+	PlayType,
+	PlayTypeEnum,
+	PlayTypeGaldins,
+	PlayTypeLielais,
+	PlayTypeMazaZole,
+	PlayTypeZole,
 	GameWithScore,
 	ZoleLoseResult,
 	ZoleWinResult,
 } from "../types";
 import { FlexLayout } from "../components/FlexLayout";
 import { TotalsTable } from "../components/TotalsTable";
-import { GameTypeDisplay } from "../components/GameTypeDisplay";
+import { PlayTypeDisplay } from "../components/PlayTypeDisplay";
 import { PanelLight } from "../components/Panels/PanelLight";
 import { twMerge } from "tailwind-merge";
 import { getPointsForGameForPlayer } from "../points";
-const variantClasses = new Map<GameTypeEnum, string>([
+const variantClasses = new Map<PlayTypeEnum, string>([
 	[
-		GameTypeEnum.Galdins,
+		PlayTypeEnum.Galdins,
 		"hover:bg-orange-400/20 bg-orange-400/10 text-white border-orange-500 hover:border-orange-400",
 	],
 	[
-		GameTypeEnum.MazaZole,
+		PlayTypeEnum.MazaZole,
 		"hover:bg-red-400/20 bg-red-400/10 text-white border-red-500 hover:border-red-400",
 	],
 	[
-		GameTypeEnum.Zole,
+		PlayTypeEnum.Zole,
 		"hover:bg-green-400/20 bg-green-400/10 text-white border-green-500 hover:border-green-400",
 	],
 	[
-		GameTypeEnum.Lielais,
+		PlayTypeEnum.Lielais,
 		"hover:bg-blue-400/20 bg-blue-400/10 text-white border-blue-500 hover:border-blue-400",
 	],
 ]);
@@ -58,13 +58,13 @@ const variantClasses = new Map<GameTypeEnum, string>([
 const ActionButton: FC<
 	PropsWithChildren<{
 		onClick: () => void;
-		gameType: GameTypeEnum;
+		type: PlayTypeEnum;
 	}>
-> = ({ onClick, children, gameType }) => {
+> = ({ onClick, children, type }) => {
 	return (
 		<button
 			type="button"
-			className={`rounded-lg border-2 px-4 py-2 text-sm font-semibold shadow-md transition-all duration-300 hover:text-white hover:shadow-lg ${variantClasses.get(gameType)}`}
+			className={`rounded-lg border-2 px-4 py-2 text-sm font-semibold shadow-md transition-all duration-300 hover:text-white hover:shadow-lg ${variantClasses.get(type)}`}
 			onClick={onClick}
 		>
 			{children}
@@ -76,11 +76,11 @@ const GameContext = createContext({} as GameContext);
 type GameContext = {
 	state: Required<GameState>;
 	gamesWithScore: GameWithScore[];
-	setGamestateAction(action: GameTypeEnum, player: number): void;
-	gameResultZaudejaGaldinu(gameType: GameTypeGaldins, player: number): void;
-	gameResultMazaZole(gameType: GameTypeMazaZole, result: boolean): void;
+	setGamestateAction(action: PlayTypeEnum, player: number): void;
+	gameResultZaudejaGaldinu(type: PlayTypeGaldins, player: number): void;
+	gameResultMazaZole(type: PlayTypeMazaZole, result: boolean): void;
 	gameResultLielais(
-		gameType: GameTypeZole | GameTypeLielais,
+		type: PlayTypeZole | PlayTypeLielais,
 		result: ZoleWinResult | ZoleLoseResult,
 	): void;
 };
@@ -136,14 +136,14 @@ const RouteComponent: FC = () => {
 	}, [state]);
 	const navigate = useNavigateGame();
 	const setGamestateAction = useCallback(
-		(action: GameTypeEnum, player: number) => {
-			if (action === GameTypeEnum.Galdins) {
+		(action: PlayTypeEnum, player: number) => {
+			if (action === PlayTypeEnum.Galdins) {
 				if (state.preGameActions === 2) {
 					return navigate(
 						{
 							...state,
 							preGameActions: 0,
-							gameType: [GameTypeEnum.Galdins],
+							gameType: [PlayTypeEnum.Galdins],
 						},
 						"players",
 					);
@@ -171,8 +171,8 @@ const RouteComponent: FC = () => {
 		[navigate, state],
 	);
 	const gameResultZaudejaGaldinu = useCallback(
-		(gameType: GameTypeGaldins, player: number) => {
-			const game: Game = [...gameType, player, new Date().toISOString()];
+		(type: PlayTypeGaldins, player: number) => {
+			const game: Game = [...type, player, new Date().toISOString()];
 			const nextDealer =
 				(state.dealer + state.games.length + 1) % state.players.length;
 			return navigate(
@@ -188,8 +188,8 @@ const RouteComponent: FC = () => {
 		[navigate, state],
 	);
 	const gameResultMazaZole = useCallback(
-		(gameType: GameTypeMazaZole, result: boolean) => {
-			const game: Game = [...gameType, +result, new Date().toISOString()];
+		(type: PlayTypeMazaZole, result: boolean) => {
+			const game: Game = [...type, +result, new Date().toISOString()];
 			const nextDealer =
 				(state.dealer + state.games.length + 1) % state.players.length;
 			return navigate(
@@ -206,10 +206,10 @@ const RouteComponent: FC = () => {
 	);
 	const gameResultLielais = useCallback(
 		(
-			gameType: GameTypeZole | GameTypeLielais,
+			type: PlayTypeZole | PlayTypeLielais,
 			result: ZoleWinResult | ZoleLoseResult,
 		) => {
-			const game: Game = [...gameType, result, new Date().toISOString()];
+			const game: Game = [...type, result, new Date().toISOString()];
 			const nextDealer =
 				(state.dealer + state.games.length + 1) % state.players.length;
 			return navigate(
@@ -287,7 +287,7 @@ const CurrentGamePlayer: FC<{
 	currentDealer: number;
 	playerCount: number;
 	preGameActions: number;
-	game: GameType | null;
+	game: PlayType | null;
 }> = ({
 	player,
 	playerIndex,
@@ -368,27 +368,27 @@ const PreGameActions: FC<{ player: number }> = ({ player }) => {
 	return (
 		<div className="flex flex-col gap-2" data-component="Actions">
 			<ActionButton
-				gameType={GameTypeEnum.Galdins}
-				onClick={() => setGamestateAction(GameTypeEnum.Galdins, player)}
+				type={PlayTypeEnum.Galdins}
+				onClick={() => setGamestateAction(PlayTypeEnum.Galdins, player)}
 			>
 				Garām
 			</ActionButton>
 			<ActionButton
-				gameType={GameTypeEnum.Lielais}
-				onClick={() => setGamestateAction(GameTypeEnum.Lielais, player)}
+				type={PlayTypeEnum.Lielais}
+				onClick={() => setGamestateAction(PlayTypeEnum.Lielais, player)}
 			>
 				Lielais
 			</ActionButton>
 			<ActionButton
-				gameType={GameTypeEnum.Zole}
-				onClick={() => setGamestateAction(GameTypeEnum.Zole, player)}
+				type={PlayTypeEnum.Zole}
+				onClick={() => setGamestateAction(PlayTypeEnum.Zole, player)}
 			>
 				Zole
 			</ActionButton>
 			<ActionButton
-				gameType={GameTypeEnum.MazaZole}
+				type={PlayTypeEnum.MazaZole}
 				onClick={() =>
-					setGamestateAction(GameTypeEnum.MazaZole, player)
+					setGamestateAction(PlayTypeEnum.MazaZole, player)
 				}
 			>
 				Mazā zole
@@ -398,18 +398,18 @@ const PreGameActions: FC<{ player: number }> = ({ player }) => {
 };
 
 const GameActions: FC<{
-	game: GameType;
+	game: PlayType;
 	playerIndex: number;
 }> = ({ game, playerIndex }) => {
 	switch (game[0]) {
-		case GameTypeEnum.Galdins:
+		case PlayTypeEnum.Galdins:
 			return <GameActionsGaldins game={game} playerIndex={playerIndex} />;
-		case GameTypeEnum.MazaZole:
+		case PlayTypeEnum.MazaZole:
 			return (
 				<GameActionsMazaZole game={game} playerIndex={playerIndex} />
 			);
-		case GameTypeEnum.Lielais:
-		case GameTypeEnum.Zole:
+		case PlayTypeEnum.Lielais:
+		case PlayTypeEnum.Zole:
 			return <GameActionsLielais game={game} playerIndex={playerIndex} />;
 		default:
 			return null;
@@ -417,15 +417,15 @@ const GameActions: FC<{
 };
 
 const GameActionsGaldins: FC<{
-	game: GameTypeGaldins;
+	game: PlayTypeGaldins;
 	playerIndex: number;
 }> = ({ game, playerIndex }) => {
 	const { gameResultZaudejaGaldinu } = useGameContext();
 	return (
 		<>
-			<GameTypeDisplay gameType={game[0]} />
+			<PlayTypeDisplay type={game[0]} />
 			<ActionButton
-				gameType={GameTypeEnum.MazaZole}
+				type={PlayTypeEnum.MazaZole}
 				onClick={() => gameResultZaudejaGaldinu(game, playerIndex)}
 			>
 				Zaudēja
@@ -434,7 +434,7 @@ const GameActionsGaldins: FC<{
 	);
 };
 const GameActionsMazaZole: FC<{
-	game: GameTypeMazaZole;
+	game: PlayTypeMazaZole;
 	playerIndex: number;
 }> = ({ game, playerIndex }) => {
 	const { gameResultMazaZole } = useGameContext();
@@ -444,16 +444,16 @@ const GameActionsMazaZole: FC<{
 	}
 	return (
 		<>
-			<GameTypeDisplay gameType={game[0]} />
+			<PlayTypeDisplay type={game[0]} />
 			<div className="flex flex-col gap-2">
 				<ActionButton
-					gameType={GameTypeEnum.Zole}
+					type={PlayTypeEnum.Zole}
 					onClick={() => gameResultMazaZole(game, true)}
 				>
 					Uzvarēja
 				</ActionButton>
 				<ActionButton
-					gameType={GameTypeEnum.MazaZole}
+					type={PlayTypeEnum.MazaZole}
 					onClick={() => gameResultMazaZole(game, false)}
 				>
 					Zaudēja
@@ -463,7 +463,7 @@ const GameActionsMazaZole: FC<{
 	);
 };
 const GameActionsLielais: FC<{
-	game: GameTypeLielais | GameTypeZole;
+	game: PlayTypeLielais | PlayTypeZole;
 	playerIndex: number;
 }> = ({ game, playerIndex }) => {
 	const { gameResultLielais } = useGameContext();
@@ -473,11 +473,11 @@ const GameActionsLielais: FC<{
 	}
 	return (
 		<>
-			<GameTypeDisplay gameType={game[0]} />
+			<PlayTypeDisplay type={game[0]} />
 			<div className="flex gap-2">
 				<div className="flex flex-1 flex-col gap-2">
 					<ActionButton
-						gameType={GameTypeEnum.Zole}
+						type={PlayTypeEnum.Zole}
 						onClick={() =>
 							gameResultLielais(game, ZoleWinResult.win61)
 						}
@@ -485,7 +485,7 @@ const GameActionsLielais: FC<{
 						61 - 90 acis
 					</ActionButton>
 					<ActionButton
-						gameType={GameTypeEnum.Zole}
+						type={PlayTypeEnum.Zole}
 						onClick={() =>
 							gameResultLielais(game, ZoleWinResult.win91)
 						}
@@ -493,7 +493,7 @@ const GameActionsLielais: FC<{
 						91+ acis
 					</ActionButton>
 					<ActionButton
-						gameType={GameTypeEnum.Zole}
+						type={PlayTypeEnum.Zole}
 						onClick={() =>
 							gameResultLielais(game, ZoleWinResult.winAll)
 						}
@@ -503,7 +503,7 @@ const GameActionsLielais: FC<{
 				</div>
 				<div className="flex flex-1 flex-col gap-2">
 					<ActionButton
-						gameType={GameTypeEnum.MazaZole}
+						type={PlayTypeEnum.MazaZole}
 						onClick={() =>
 							gameResultLielais(game, ZoleLoseResult.lost30)
 						}
@@ -511,7 +511,7 @@ const GameActionsLielais: FC<{
 						≤30 acis
 					</ActionButton>
 					<ActionButton
-						gameType={GameTypeEnum.MazaZole}
+						type={PlayTypeEnum.MazaZole}
 						onClick={() =>
 							gameResultLielais(game, ZoleLoseResult.lost60)
 						}
@@ -519,7 +519,7 @@ const GameActionsLielais: FC<{
 						31 - 60 acis
 					</ActionButton>
 					<ActionButton
-						gameType={GameTypeEnum.MazaZole}
+						type={PlayTypeEnum.MazaZole}
 						onClick={() =>
 							gameResultLielais(game, ZoleLoseResult.lostAll)
 						}

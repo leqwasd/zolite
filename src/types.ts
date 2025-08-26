@@ -1,27 +1,25 @@
+export type Setup0 = [];
 export type Setup1 = [number];
 export type Setup2 = [...Setup1, string[]];
 export type Setup3 = [...Setup2, number];
 export type SetupData = Setup1 | Setup2 | Setup3;
 
-export const enum GameTypeEnum {
+export const enum PlayTypeEnum {
 	Galdins = 0,
 	MazaZole = 1,
 	Zole = 2,
 	Lielais = 3,
 }
 
-export type GameTypeGaldins = [gameType: GameTypeEnum.Galdins];
-export type GameTypeMazaZole = [
-	gameType: GameTypeEnum.MazaZole,
-	player: number,
-];
-export type GameTypeZole = [gameType: GameTypeEnum.Zole, player: number];
-export type GameTypeLielais = [gameType: GameTypeEnum.Lielais, player: number];
-export type GameType =
-	| GameTypeGaldins
-	| GameTypeMazaZole
-	| GameTypeZole
-	| GameTypeLielais;
+export type PlayTypeGaldins = [type: PlayTypeEnum.Galdins];
+export type PlayTypeMazaZole = [type: PlayTypeEnum.MazaZole, player: number];
+export type PlayTypeZole = [type: PlayTypeEnum.Zole, player: number];
+export type PlayTypeLielais = [type: PlayTypeEnum.Lielais, player: number];
+export type PlayType =
+	| PlayTypeGaldins
+	| PlayTypeMazaZole
+	| PlayTypeZole
+	| PlayTypeLielais;
 
 export type GameMeta = {
 	id: string;
@@ -34,31 +32,31 @@ export type GameState = {
 	dealer: number;
 	games?: Game[];
 	preGameActions?: number;
-	gameType?: GameType | null;
+	gameType?: PlayType | null;
 };
 export type Game =
-	| GameTypeGaldinsResult
-	| GameTypeMazaZoleResult
-	| GameTypeZoleResult
-	| GameTypeLielaisResult;
+	| PlayTypeGaldinsResult
+	| PlayTypeMazaZoleResult
+	| PlayTypeZoleResult
+	| PlayTypeLielaisResult;
 export type GameWithScore = { game: Game; scores: number[]; diff: number[] };
-export type GameTypeGaldinsResult = [
-	...GameTypeGaldins,
+export type PlayTypeGaldinsResult = [
+	...PlayTypeGaldins,
 	loser: number,
 	date: string,
 ];
-export type GameTypeMazaZoleResult = [
-	...GameTypeMazaZole,
+export type PlayTypeMazaZoleResult = [
+	...PlayTypeMazaZole,
 	result: number,
 	date: string,
 ];
-export type GameTypeZoleResult = [
-	...GameTypeZole,
+export type PlayTypeZoleResult = [
+	...PlayTypeZole,
 	result: ZoleWinResult | ZoleLoseResult,
 	date: string,
 ];
-export type GameTypeLielaisResult = [
-	...GameTypeLielais,
+export type PlayTypeLielaisResult = [
+	...PlayTypeLielais,
 	result: ZoleWinResult | ZoleLoseResult,
 	date: string,
 ];

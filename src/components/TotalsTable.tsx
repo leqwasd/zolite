@@ -1,6 +1,6 @@
 import { FC, useMemo } from "react";
-import { GameTypeEnum, GameWithScore, ZoleWinResult } from "../types";
-import { GameTypeDisplay } from "./GameTypeDisplay";
+import { PlayTypeEnum, GameWithScore, ZoleWinResult } from "../types";
+import { PlayTypeDisplay } from "./PlayTypeDisplay";
 
 export const TotalsTable: FC<{
 	games: GameWithScore[];
@@ -46,7 +46,7 @@ export const TotalsTable: FC<{
 							<GameCell key={j} player={j} game={game} />
 						))}
 						<td className="py-1 text-center text-sm text-emerald-200">
-							<GameTypeDisplay gameType={game.game[0]} />
+							<PlayTypeDisplay type={game.game[0]} />
 						</td>
 					</tr>
 				))}
@@ -96,7 +96,7 @@ function useGameResultClassName(
 ): string {
 	const { game } = gameWithScore;
 	if (
-		(game[0] === GameTypeEnum.Lielais || game[0] === GameTypeEnum.Zole) &&
+		(game[0] === PlayTypeEnum.Lielais || game[0] === PlayTypeEnum.Zole) &&
 		game[1] === player
 	) {
 		if (
@@ -108,13 +108,13 @@ function useGameResultClassName(
 		} else {
 			return "bg-red-500/30 border border-red-400/50";
 		}
-	} else if (game[0] === GameTypeEnum.MazaZole && game[1] === player) {
+	} else if (game[0] === PlayTypeEnum.MazaZole && game[1] === player) {
 		if (game[2]) {
 			return "bg-green-500/30 border border-green-400/50";
 		} else {
 			return "bg-red-500/30 border border-red-400/50";
 		}
-	} else if (game[0] === GameTypeEnum.Galdins && game[1] === player) {
+	} else if (game[0] === PlayTypeEnum.Galdins && game[1] === player) {
 		return "bg-red-500/30 border border-red-400/50";
 	}
 

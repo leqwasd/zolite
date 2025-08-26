@@ -1,4 +1,4 @@
-import { Game, GameTypeEnum, ZoleLoseResult, ZoleWinResult } from "./types";
+import { Game, PlayTypeEnum, ZoleLoseResult, ZoleWinResult } from "./types";
 
 const PointTable = {
 	GaldinsLosePerPlayer: -2,
@@ -25,13 +25,13 @@ export function getPointsForGameForPlayer(
 ) {
 	const modifier = playerCount - 1;
 	switch (game[0]) {
-		case GameTypeEnum.Galdins:
+		case PlayTypeEnum.Galdins:
 			if (game[1] == player) {
 				return PointTable.GaldinsLosePerPlayer * modifier;
 			} else {
 				return -PointTable.GaldinsLosePerPlayer;
 			}
-		case GameTypeEnum.MazaZole:
+		case PlayTypeEnum.MazaZole:
 			if (game[2]) {
 				if (game[1] === player) {
 					return PointTable.MazaZoleWinPerPlayer * modifier;
@@ -45,7 +45,7 @@ export function getPointsForGameForPlayer(
 					return -PointTable.MazaZoleLossPerPlayer;
 				}
 			}
-		case GameTypeEnum.Lielais:
+		case PlayTypeEnum.Lielais:
 			switch (game[2]) {
 				case ZoleWinResult.win61:
 					return player === game[1]
@@ -74,7 +74,7 @@ export function getPointsForGameForPlayer(
 				default:
 					return 0;
 			}
-		case GameTypeEnum.Zole:
+		case PlayTypeEnum.Zole:
 			switch (game[2]) {
 				case ZoleWinResult.win61:
 					return player === game[1]
