@@ -2,6 +2,7 @@ import {
 	compressToEncodedURIComponent,
 	decompressFromEncodedURIComponent,
 } from "lz-string";
+import { GameState, GameType } from "./types";
 export function compress<T>(data: T): string {
 	return compressToEncodedURIComponent(JSON.stringify(data));
 }
@@ -9,6 +10,17 @@ export function compress<T>(data: T): string {
 export function decompress<T>(data: string): T {
 	return JSON.parse(decompressFromEncodedURIComponent(data)) as T;
 }
+
+export function fixUpGameState(data: GameState): GameState {
+	data.type ??= GameType.PGM;
+	data.pules ??= Array.from({ length: data.players.length + 1 }, () => 0);
+	data.meta ??= {
+		id: crypto.randomUUID(),
+		date: new Date().toISOString(),
+	};
+	return data;
+}
+
 const actionMap = new Map([
 	[3, [2, 0, 1]],
 	[4, [null, 0, 1, 2]],

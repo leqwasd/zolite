@@ -1,8 +1,13 @@
-export type Setup0 = [];
-export type Setup1 = [number];
+export const enum GameType {
+	PGM = "PGM",
+	PM = "PM",
+}
+
+export type Setup0 = [GameType];
+export type Setup1 = [...Setup0, number];
 export type Setup2 = [...Setup1, string[]];
 export type Setup3 = [...Setup2, number];
-export type SetupData = Setup1 | Setup2 | Setup3;
+export type SetupData = Setup0 | Setup1 | Setup2 | Setup3;
 
 export const enum PlayTypeEnum {
 	Galdins = 0,
@@ -28,6 +33,8 @@ export type GameMeta = {
 
 export type GameState = {
 	meta: GameMeta;
+	type: GameType;
+	pules: number[];
 	players: string[];
 	dealer: number;
 	games?: Game[];
@@ -72,9 +79,12 @@ export const enum ZoleLoseResult {
 	lostAll = -3,
 }
 export function convertGameStateFromSetup(setup: Setup3): GameState {
+	const [type, playerCount, players, dealer] = setup;
 	return {
-		players: setup[1],
-		dealer: setup[2],
+		type,
+		players,
+		dealer,
+		pules: Array.from({ length: playerCount + 1 }, () => 0),
 		meta: {
 			id: crypto.randomUUID(),
 			date: new Date().toISOString(),

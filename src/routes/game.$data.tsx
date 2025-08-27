@@ -15,6 +15,7 @@ import {
 	getRoka,
 	findPlayerWithAction,
 	findPlayerWithFirstRoka,
+	fixUpGameState,
 } from "../utils";
 import {
 	Game,
@@ -541,7 +542,7 @@ export const Route = createFileRoute("/game/$data")({
 	component: RouteComponent,
 	params: {
 		parse: (params) => ({
-			data: decompress<GameState>(params.data),
+			data: fixUpGameState(decompress<GameState>(params.data)),
 		}),
 		stringify: (params) => ({
 			data: compress(params.data),

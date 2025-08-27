@@ -9,7 +9,14 @@ import {
 } from "react";
 import { compress, decompress } from "../utils";
 import { FlexLayout } from "../components/FlexLayout";
-import { convertGameStateFromSetup, Setup1, Setup2, SetupData } from "../types";
+import {
+	convertGameStateFromSetup,
+	GameType,
+	Setup0,
+	Setup1,
+	Setup2,
+	SetupData,
+} from "../types";
 
 // Reusable Setup Page Components
 const SetupPageLayout: FC<{ children: ReactNode; title: string }> = ({
@@ -62,12 +69,14 @@ const SetupInput: FC<{ placeholder: string }> = ({ placeholder }) => (
 const RouteComponent: FC = () => {
 	const { data } = Route.useParams();
 	if (data == null) {
-		return <PlayerCountPage />;
+		return <GameTypeSelectPage />;
 	} else if (data.length === 1) {
-		return <PlayerNamesPage setup={data} />;
+		return <PlayerCountPage data={data} />;
 	} else if (data.length === 2) {
-		return <DealerSelectPage setup={data} />;
+		return <PlayerNamesPage data={data} />;
 	} else if (data.length === 3) {
+		return <DealerSelectPage data={data} />;
+	} else if (data.length === 4) {
 		// Shouldn't happen here, see redirect in the loader
 		return null;
 	}
@@ -79,19 +88,29 @@ const RouteComponent: FC = () => {
 	);
 };
 
-const PlayerCountPage: FC = () => {
+const GameTypeSelectPage: FC = () => {
 	return (
-		<SetupPageLayout title="Izvēlies spēlētāju skaitu">
+		<SetupPageLayout title="Izvēlies spēles veidu">
 			<FlexLayout className="gap-4">
-				<SetupButton data={[3]}>3</SetupButton>
-				<SetupButton data={[4]}>4</SetupButton>
-				<SetupButton data={[5]}>5</SetupButton>
+				<SetupButton data={[GameType.PGM]}>Ar galdiņu</SetupButton>
+				<SetupButton data={[GameType.PM]}>Ar pulēm</SetupButton>
 			</FlexLayout>
 		</SetupPageLayout>
 	);
 };
-const PlayerNamesPage: FC<{ setup: Setup1 }> = ({ setup }) => {
-	const playerCount = setup[0];
+const PlayerCountPage: FC<{ data: Setup0 }> = ({ data }) => {
+	return (
+		<SetupPageLayout title="Izvēlies spēlētāju skaitu">
+			<FlexLayout className="gap-4">
+				<SetupButton data={[...data, 3]}>3</SetupButton>
+				<SetupButton data={[...data, 4]}>4</SetupButton>
+				<SetupButton data={[...data, 5]}>5</SetupButton>
+			</FlexLayout>
+		</SetupPageLayout>
+	);
+};
+const PlayerNamesPage: FC<{ data: Setup1 }> = ({ data }) => {
+	const playerCount = data[1];
 	const formRef = useRef<HTMLFormElement>(null);
 	const navigate = Route.useNavigate();
 	const onSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
@@ -101,7 +120,7 @@ const PlayerNamesPage: FC<{ setup: Setup1 }> = ({ setup }) => {
 				to: "/new/{-$data}",
 				params: {
 					data: [
-						...setup,
+						...data,
 						Array.from(
 							new FormData(formRef.current!).values(),
 						) as string[],
@@ -109,7 +128,7 @@ const PlayerNamesPage: FC<{ setup: Setup1 }> = ({ setup }) => {
 				},
 			});
 		},
-		[navigate, setup],
+		[navigate, data],
 	);
 
 	// Generate placeholders based on player count
@@ -131,12 +150,12 @@ const PlayerNamesPage: FC<{ setup: Setup1 }> = ({ setup }) => {
 		</SetupPageLayout>
 	);
 };
-const DealerSelectPage: FC<{ setup: Setup2 }> = ({ setup }) => {
+const DealerSelectPage: FC<{ data: Setup2 }> = ({ data }) => {
 	return (
 		<SetupPageLayout title="Izvēlies sākuma dalītāju">
 			<FlexLayout className="gap-4">
-				{setup[1].map((name, dealer) => (
-					<SetupButton key={dealer} data={[...setup, dealer]}>
+				{data[2].map((name, dealer) => (
+					<SetupButton key={dealer} data={[...data, dealer]}>
 						{name}
 					</SetupButton>
 				))}
@@ -159,7 +178,7 @@ export const Route = createFileRoute("/new/{-$data}")({
 		}),
 	},
 	loader: ({ params }) => {
-		if (params.data && params.data.length === 3) {
+		if (params.data && params.data.length === 4) {
 			throw redirect({
 				to: "/game/$data",
 				params: {
