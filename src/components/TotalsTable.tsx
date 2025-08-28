@@ -69,7 +69,7 @@ export const TotalsTable: FC<{
 				))}
 			</tbody>
 			<tfoot>
-				<tr className="border-t border-emerald-400/30">
+				<tr className="border-t-2 border-emerald-400/30">
 					<td className="pt-2 font-bold text-emerald-100">Σ</td>
 					{totals.map((total, i) => (
 						<th
@@ -82,14 +82,14 @@ export const TotalsTable: FC<{
 					<td className="pt-2" />
 				</tr>
 				{pules.some((p) => p > 0) && (
-					<tr className="border-t border-emerald-400/30">
+					<tr className="border-t-2 border-emerald-400/30">
 						<td className="pt-2 font-bold text-emerald-100">
 							Pules
 						</td>
 						{pules.map((count, i) => (
 							<th
 								key={i}
-								className="pt-2 text-center text-lg font-bold text-emerald-100"
+								className="pt-2 text-center text-lg font-bold text-emerald-300"
 							>
 								{count > 0 && count}
 							</th>

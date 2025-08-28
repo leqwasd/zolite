@@ -29,7 +29,7 @@ function useNavigateGame() {
 				params: {
 					data,
 				},
-				hash: hash ?? `player-${3}`,
+				hash,
 				hashScrollIntoView: {
 					behavior: "smooth",
 					block: "center",
@@ -277,6 +277,17 @@ export function useGameContextInContext() {
 		},
 		[navigate, state],
 	);
+	const givePersonalPule = useCallback(
+		(player: number) => {
+			const pules = [...state.pules];
+			pules[player] = pules[player] + 1;
+			return navigate({
+				...state,
+				pules,
+			});
+		},
+		[navigate, state],
+	);
 	return {
 		state,
 		gamesWithScore,
@@ -285,5 +296,6 @@ export function useGameContextInContext() {
 		gameResultMazaZole,
 		gameResultLielais,
 		gameResultZole,
+		givePersonalPule,
 	};
 }
