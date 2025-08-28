@@ -3,6 +3,7 @@ import { PlayType, PlayTypeEnum } from "../../types";
 import { GameActionsGaldins } from "./GameActionsGaldins";
 import { GameActionsMazaZole } from "./GameActionsMazaZole";
 import { GameActionsLielais } from "./GameActionsLielais";
+import { GameActionsZole } from "./GameActionsZole";
 
 export const GameActions: FC<{
 	game: PlayType;
@@ -16,8 +17,9 @@ export const GameActions: FC<{
 				<GameActionsMazaZole game={game} playerIndex={playerIndex} />
 			);
 		case PlayTypeEnum.Lielais:
-		case PlayTypeEnum.Zole:
 			return <GameActionsLielais game={game} playerIndex={playerIndex} />;
+		case PlayTypeEnum.Zole:
+			return <GameActionsZole game={game} playerIndex={playerIndex} />;
 		default:
 			return null;
 	}

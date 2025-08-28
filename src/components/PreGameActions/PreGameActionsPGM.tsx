@@ -1,17 +1,17 @@
 import { FC } from "react";
-import { ActionButton } from "./ActionButton";
-import { PlayTypeEnum } from "../types";
-import { useGameContext } from "../GameContext/useGameContext";
+import { useGameContext } from "../../GameContext/useGameContext";
+import { ActionButton } from "../ActionButton";
+import { PlayTypeEnum } from "../../types";
 
 export const PreGameActionsPGM: FC<{ player: number }> = ({ player }) => {
-	const { setGamestateAction } = useGameContext();
+	const { setGamestateAction, state } = useGameContext();
 	return (
 		<div className="flex flex-col gap-2" data-component="Actions">
 			<ActionButton
 				type={PlayTypeEnum.Galdins}
 				onClick={() => setGamestateAction(PlayTypeEnum.Galdins, player)}
 			>
-				Garām
+				{state.preGameActions === 2 ? "Galdiņš" : "Garām"}
 			</ActionButton>
 			<ActionButton
 				type={PlayTypeEnum.Lielais}

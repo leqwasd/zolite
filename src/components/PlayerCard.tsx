@@ -4,8 +4,8 @@ import { isPlayerInGame, shouldGiveAction } from "../utils";
 import { PanelLight } from "./Panels/PanelLight";
 import { twMerge } from "tailwind-merge";
 import { Roka } from "./Roka";
-import { PreGameActionsPGM } from "./PreGameActionsPGM";
 import { GameActions } from "./GameActions";
+import { PreGameActions } from "./PreGameActions";
 
 export const PlayerCard: FC<{
 	player: string;
@@ -51,9 +51,7 @@ export const PlayerCard: FC<{
 				playerIndex={playerIndex}
 			/>
 
-			{shouldGivePreGameAction && (
-				<PreGameActionsPGM player={playerIndex} />
-			)}
+			{shouldGivePreGameAction && <PreGameActions player={playerIndex} />}
 
 			{shouldGiveGameAction && (
 				<GameActions game={game} playerIndex={playerIndex} />

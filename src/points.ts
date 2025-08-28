@@ -1,4 +1,4 @@
-import { Game, PlayTypeEnum, ZoleLoseResult, ZoleWinResult } from "./types";
+import { Game, PlayTypeEnum, LoseResult, WinResult } from "./types";
 
 const PointTable = {
 	GaldinsLosePerPlayer: -2,
@@ -47,27 +47,27 @@ export function getPointsForGameForPlayer(
 			}
 		case PlayTypeEnum.Lielais:
 			switch (game[2]) {
-				case ZoleWinResult.win61:
+				case WinResult.win61:
 					return player === game[1]
 						? PointTable.LielaisWin * modifier
 						: -PointTable.LielaisWin;
-				case ZoleWinResult.win91:
+				case WinResult.win91:
 					return player === game[1]
 						? PointTable.LielaisWinJanos * modifier
 						: -PointTable.LielaisWinJanos;
-				case ZoleWinResult.winAll:
+				case WinResult.winAll:
 					return player === game[1]
 						? PointTable.LielaisWinBezstiki * modifier
 						: -PointTable.LielaisWinBezstiki;
-				case ZoleLoseResult.lost60:
+				case LoseResult.lost60:
 					return player === game[1]
 						? PointTable.LielaisLost * modifier
 						: -PointTable.LielaisLost;
-				case ZoleLoseResult.lost30:
+				case LoseResult.lost30:
 					return player === game[1]
 						? PointTable.LielaisLostJanos * modifier
 						: -PointTable.LielaisLostJanos;
-				case ZoleLoseResult.lostAll:
+				case LoseResult.lostAll:
 					return player === game[1]
 						? PointTable.LielaisLostBezstiki * modifier
 						: -PointTable.LielaisLostBezstiki;
@@ -76,32 +76,34 @@ export function getPointsForGameForPlayer(
 			}
 		case PlayTypeEnum.Zole:
 			switch (game[2]) {
-				case ZoleWinResult.win61:
+				case WinResult.win61:
 					return player === game[1]
 						? PointTable.ZoleWin * modifier
 						: -PointTable.ZoleWin;
-				case ZoleWinResult.win91:
+				case WinResult.win91:
 					return player === game[1]
 						? PointTable.ZoleWinJanos * modifier
 						: -PointTable.ZoleWinJanos;
-				case ZoleWinResult.winAll:
+				case WinResult.winAll:
 					return player === game[1]
 						? PointTable.ZoleWinBezstiki * modifier
 						: -PointTable.ZoleWinBezstiki;
-				case ZoleLoseResult.lost60:
+				case LoseResult.lost60:
 					return player === game[1]
 						? PointTable.ZoleLost * modifier
 						: -PointTable.ZoleLost;
-				case ZoleLoseResult.lost30:
+				case LoseResult.lost30:
 					return player === game[1]
 						? PointTable.ZoleLostJanos * modifier
 						: -PointTable.ZoleLostJanos;
-				case ZoleLoseResult.lostAll:
+				case LoseResult.lostAll:
 					return player === game[1]
 						? PointTable.ZoleLostBezstiki * modifier
 						: -PointTable.ZoleLostBezstiki;
 				default:
 					return 0;
 			}
+		case PlayTypeEnum.Pule:
+			return 0;
 	}
 }

@@ -1,23 +1,24 @@
 import { FC, useMemo } from "react";
-import { PlayTypeEnum, GameWithScore, ZoleWinResult } from "../types";
+import { PlayTypeEnum, GameWithScore, WinResult, Game } from "../types";
 import { PlayTypeDisplay } from "./PlayTypeDisplay";
 
 export const TotalsTable: FC<{
 	games: GameWithScore[];
 	players: string[];
-}> = ({ games, players }) => {
+	pules: number[];
+}> = ({ games, players, pules }) => {
 	const totals = useMemo(
 		() =>
 			games.length === 0
-				? new Array(players.length).fill(0)
+				? new Array<number>(players.length).fill(0)
 				: games[games.length - 1].scores,
 		[games, players.length],
 	);
 	return (
-		<table className="w-full text-white">
+		<table className="w-full table-fixed text-white">
 			<thead>
 				<tr className="border-b border-emerald-400/30">
-					<td className="pb-2 text-sm text-emerald-200">#</td>
+					<td className="w-15 pb-2 text-sm text-emerald-200">#</td>
 					{players.map((name, i) => (
 						<th
 							key={i}
@@ -42,12 +43,28 @@ export const TotalsTable: FC<{
 						<td className="py-1 text-sm text-emerald-300">
 							{i + 1}
 						</td>
-						{players.map((_, j) => (
-							<GameCell key={j} player={j} game={game} />
-						))}
-						<td className="py-1 text-center text-sm text-emerald-200">
-							<PlayTypeDisplay type={game.game[0]} />
-						</td>
+						{game.game[0] === PlayTypeEnum.Pule ? (
+							<>
+								<td colSpan={players.length}></td>
+								<td className="py-1 text-center text-sm text-emerald-200">
+									Kopējā pule
+								</td>
+							</>
+						) : (
+							<>
+								{players.map((_, j) => (
+									<GameCell
+										key={j}
+										player={j}
+										game={game}
+										players={players}
+									/>
+								))}
+								<td className="py-1 text-center text-sm text-emerald-200">
+									<PlayTypeDisplay type={game.game[0]} />
+								</td>
+							</>
+						)}
 					</tr>
 				))}
 			</tbody>
@@ -64,31 +81,75 @@ export const TotalsTable: FC<{
 					))}
 					<td className="pt-2" />
 				</tr>
+				{pules.some((p) => p > 0) && (
+					<tr className="border-t border-emerald-400/30">
+						<td className="pt-2 font-bold text-emerald-100">
+							Pules
+						</td>
+						{pules.map((count, i) => (
+							<th
+								key={i}
+								className="pt-2 text-center text-lg font-bold text-emerald-100"
+							>
+								{count > 0 && count}
+							</th>
+						))}
+					</tr>
+				)}
 			</tfoot>
 		</table>
 	);
 };
 
-const GameCell: FC<{ player: number; game: GameWithScore }> = ({
-	player,
-	game,
-}) => {
+const GameCell: FC<{
+	player: number;
+	game: GameWithScore;
+	players: string[];
+}> = ({ player, game, players }) => {
 	const gameResultClassName = useGameResultClassName(player, game);
 	return (
 		<td className={"py-1 text-center " + gameResultClassName}>
-			<span className="font-semibold text-white">
+			<span className="text-xs font-light text-emerald-200">
+				<PulePoints
+					game={game.game}
+					player={player}
+					players={players}
+				/>
+			</span>
+			<span className="mx-3 font-semibold text-white">
 				{game.scores[player]}
-			</span>{" "}
-			<Diff diff={game.diff[player]} />
+			</span>
+			<span className="text-xs font-light text-emerald-200">
+				<Diff diff={game.diff[player]} />
+			</span>
 		</td>
 	);
 };
 
-const Diff: FC<{ diff: number }> = ({ diff }) => (
-	<span className="text-xs font-light text-emerald-200">
-		({useMemo(() => (diff > 0 ? `+${diff}` : `${diff}`), [diff])})
-	</span>
-);
+const Diff: FC<{ diff: number }> = ({ diff }) =>
+	useMemo(() => (diff > 0 ? `+${diff}` : `${diff}`), [diff]);
+
+const PulePoints: FC<{ game: Game; player: number; players: string[] }> = ({
+	game,
+	player,
+	players,
+}) => {
+	if (
+		game[0] === PlayTypeEnum.Lielais &&
+		game[1] === player &&
+		game[3] !== -1
+	) {
+		if (game[3] === players.length) {
+			// Izņēma kopējo puli
+			return `pule (kopējā)`;
+		} else if (game[3] !== player) {
+			// Izņēma kāda cita puli
+			return `pule (${players[game[3]]})`;
+		}
+		return `pule (savējā)`;
+	}
+	return null;
+};
 
 function useGameResultClassName(
 	player: number,
@@ -100,9 +161,9 @@ function useGameResultClassName(
 		game[1] === player
 	) {
 		if (
-			game[2] === ZoleWinResult.win61 ||
-			game[2] === ZoleWinResult.win91 ||
-			game[2] === ZoleWinResult.winAll
+			game[2] === WinResult.win61 ||
+			game[2] === WinResult.win91 ||
+			game[2] === WinResult.winAll
 		) {
 			return "bg-green-500/30 border border-green-400/50";
 		} else {

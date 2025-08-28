@@ -24,7 +24,11 @@ const GamePage: FC = () => {
 	return (
 		<div className="relative mx-auto flex max-w-6xl flex-col gap-3">
 			<PanelLight>
-				<TotalsTable games={gamesWithScore} players={state.players} />
+				<TotalsTable
+					games={gamesWithScore}
+					players={state.players}
+					pules={state.pules}
+				/>
 			</PanelLight>
 			<FlexLayout className="gap-3" id="players">
 				{state.players.map((player, index) => (
