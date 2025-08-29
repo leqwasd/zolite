@@ -20,7 +20,7 @@ A modern, responsive web application for tracking scores in the traditional Latv
 
 ## 🚀 Live Demo
 
-Visit the live application: [Your GitHub Pages URL here]
+Visit the live application: [https://leqwasd.github.io/zolite](https://leqwasd.github.io/zolite/)
 
 ## 🛠️ Tech Stack
 
