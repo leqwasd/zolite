@@ -1,5 +1,10 @@
 import { FC, useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "@tanstack/react-router";
+import {
+	Link,
+	useLocation,
+	useMatch,
+	useMatchRoute,
+} from "@tanstack/react-router";
 import { HamburgerButton } from "./HamburgerButton";
 import { Overlay } from "./Overlay";
 
@@ -8,6 +13,28 @@ export const Navbar: FC = () => {
 	const [className, setClassName] = useState("top-0");
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
 	const location = useLocation();
+	const isInGame = useMatchRoute()({ to: "/game/$data" });
+	// Share button handler
+	const handleShare = async () => {
+		const url = window.location.href;
+		if (navigator.share) {
+			try {
+				await navigator.share({
+					title: "Zolītes spēle",
+					url,
+				});
+			} catch {
+				// User cancelled or error
+			}
+		} else {
+			try {
+				await navigator.clipboard.writeText(url);
+				alert("Saite nokopēta!");
+			} catch {
+				alert("Neizdevās nokopēt saiti.");
+			}
+		}
+	};
 
 	useEffect(() => {
 		function cb() {
@@ -71,15 +98,49 @@ export const Navbar: FC = () => {
 						<Link
 							key={item.to}
 							to={item.to}
-							className={`block px-6 py-3 text-white transition-all duration-200 hover:bg-gradient-to-r hover:from-white/20 hover:to-white/10 ${
-								location.pathname === item.to
-									? "border-r-2 border-emerald-200 bg-gradient-to-r from-white/25 to-white/15 font-semibold"
-									: ""
-							}`}
+							className={`block px-6 py-3 text-white transition-all duration-200 hover:bg-gradient-to-r hover:from-white/20 hover:to-white/10`}
+							activeProps={{
+								className:
+									"border-r-2 border-emerald-200 bg-gradient-to-r from-white/25 to-white/15 font-semibold",
+							}}
 						>
 							{item.label}
 						</Link>
 					))}
+					{/* Share Button */}
+					{!!isInGame && (
+						<button
+							onClick={handleShare}
+							title="Dalīties ar spēles saiti"
+							className="flex w-full cursor-pointer items-center gap-3 px-6 py-3 text-white transition-all duration-200 hover:bg-gradient-to-r hover:from-white/20 hover:to-white/10"
+						>
+							<svg
+								className="h-5 w-5"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2"
+								viewBox="0 0 24 24"
+							>
+								<circle cx="18" cy="5" r="3" />
+								<circle cx="6" cy="12" r="3" />
+								<circle cx="18" cy="19" r="3" />
+								<line
+									x1="8.59"
+									y1="13.51"
+									x2="15.42"
+									y2="17.49"
+								/>
+								<line
+									x1="15.41"
+									y1="6.51"
+									x2="8.59"
+									y2="10.49"
+								/>
+							</svg>
+							Dalīties
+						</button>
+					)}
+
 					<hr className="mx-6 my-2 border-white/20" />
 
 					<a
