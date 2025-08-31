@@ -11,7 +11,7 @@
 	"lang": "lv",
 	"icons": [
 		{
-			"src": "/favicon.svg",
+			"src": "/zolite/favicon.svg",
 			"sizes": "any",
 			"type": "image/svg+xml",
 			"purpose": "any maskable"
