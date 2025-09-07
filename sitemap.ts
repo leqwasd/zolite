@@ -1,7 +1,7 @@
 import { type FileRouteTypes } from "./src/routeTree.gen";
 import { Sitemap } from "tanstack-router-sitemap";
 import fs from "fs";
-import { convertGameStateFromSetup, GameType, SetupData } from "./src/types";
+import { GameState, GameType, SetupData, VersionEnum } from "./src/types";
 import LZString from "lz-string";
 
 function compress<T>(data: T): string {
@@ -36,7 +36,17 @@ export const sitemap: Sitemap<FileRouteTypes["fullPaths"]> = {
 			);
 			return [
 				{
-					path: `/?/game/${convertGameStateFromSetup([GameType.PGM, 3, ["Player 1", "Player 2", "Player 3"], 0])}`,
+					path: `/?/game/${compress({
+						version: VersionEnum.V1,
+						type: GameType.PGM,
+						players: ["Player 1", "Player 2", "Player 3"],
+						dealer: 0,
+						pules: Array.from({ length: 3 + 1 }, () => 0),
+						meta: {
+							id: "8a215020-ba7f-463f-8721-4b63fb02fb06",
+							date: "2025-09-07T10:27:44.448Z",
+						},
+					} satisfies GameState)}`,
 					lastModified,
 				},
 			];
