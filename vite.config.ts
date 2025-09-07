@@ -4,7 +4,6 @@ import tailwindcss from "@tailwindcss/vite";
 import { tanstackRouter } from "@tanstack/router-plugin/vite";
 import { generateSitemap } from "tanstack-router-sitemap";
 import { sitemap } from "./sitemap";
-
 // https://vite.dev/config/
 export default defineConfig({
 	plugins: [
