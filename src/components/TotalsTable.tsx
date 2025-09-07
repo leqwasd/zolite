@@ -1,6 +1,7 @@
 import { FC, useMemo } from "react";
 import { PlayTypeEnum, GameWithScore, WinResult, Game } from "../types";
 import { PlayTypeDisplay } from "./PlayTypeDisplay";
+import { twMerge } from "tailwind-merge";
 
 export const TotalsTable: FC<{
 	games: GameWithScore[];
@@ -14,6 +15,26 @@ export const TotalsTable: FC<{
 				: games[games.length - 1].scores,
 		[games, players.length],
 	);
+	const totalsWithPersonalPules = useMemo(() => {
+		const result = totals.slice();
+		let hasAnyChange = false;
+		for (let player = 0; player < totals.length; player++) {
+			for (let j = 0; j < pules[player]; j++) {
+				hasAnyChange = true;
+				for (let k = 0; k < totals.length; k++) {
+					if (k === player) {
+						result[k] -= totals.length - 1;
+					} else {
+						result[k] += 1;
+					}
+				}
+			}
+		}
+		if (hasAnyChange) {
+			return result;
+		}
+		return null;
+	}, [totals, pules]);
 	return (
 		<table className="w-full table-fixed text-white">
 			<thead>
@@ -69,14 +90,19 @@ export const TotalsTable: FC<{
 				))}
 			</tbody>
 			<tfoot>
-				<tr className="border-t-2 border-emerald-400/30">
+				<tr className="border-t-3 border-double border-emerald-400/30">
 					<td className="pt-2 font-bold text-emerald-100">Σ</td>
 					{totals.map((total, i) => (
-						<th
-							key={i}
-							className="pt-2 text-center text-lg font-bold text-emerald-100"
-						>
-							{total}
+						<th key={i} className="pt-2 text-center">
+							<span className="mx-3 text-lg font-bold text-white">
+								{total}
+							</span>
+							{totalsWithPersonalPules &&
+								totalsWithPersonalPules[i] !== total && (
+									<span className="text-xs font-light text-emerald-100">
+										( {totalsWithPersonalPules[i]} )
+									</span>
+								)}
 						</th>
 					))}
 					<td className="pt-2" />
@@ -108,7 +134,7 @@ const GameCell: FC<{
 }> = ({ player, game, players }) => {
 	const gameResultClassName = useGameResultClassName(player, game);
 	return (
-		<td className={"py-1 text-center " + gameResultClassName}>
+		<td className={twMerge("py-1 text-center", gameResultClassName)}>
 			<span className="text-xs font-light text-emerald-200">
 				<PulePoints
 					game={game.game}
