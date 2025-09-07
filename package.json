@@ -34,6 +34,7 @@
 		"gh-pages": "^6.3.0",
 		"globals": "^15.15.0",
 		"prettier-plugin-tailwindcss": "^0.6.14",
+		"tanstack-router-sitemap": "^1.0.12",
 		"typescript": "^5.9.2",
 		"typescript-eslint": "^8.41.0",
 		"vite": "^7.1.3",

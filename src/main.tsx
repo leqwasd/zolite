@@ -3,15 +3,19 @@ import ReactDOM from "react-dom/client";
 import {
 	RouterProvider,
 	createRouter,
-	createHashHistory,
+	createBrowserHistory,
 } from "@tanstack/react-router";
 import "./index.css";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
-const hashHistory = createHashHistory({});
+const history = createBrowserHistory({});
 // Create a new router instance
-const router = createRouter({ routeTree, history: hashHistory });
+const router = createRouter({
+	routeTree,
+	history,
+	basepath: "/zolite",
+});
 
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {
