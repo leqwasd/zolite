@@ -1,11 +1,14 @@
-import LZString from "lz-string";
+import {
+	compressToEncodedURIComponent,
+	decompressFromEncodedURIComponent,
+} from "lz-string";
 import { GameState, GameType } from "./types";
 export function compress<T>(data: T): string {
-	return LZString.compressToEncodedURIComponent(JSON.stringify(data));
+	return compressToEncodedURIComponent(JSON.stringify(data));
 }
 
 export function decompress<T>(data: string): T {
-	return JSON.parse(LZString.decompressFromEncodedURIComponent(data)) as T;
+	return JSON.parse(decompressFromEncodedURIComponent(data)) as T;
 }
 
 export function fixUpGameState(data: GameState): GameState {
