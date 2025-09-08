@@ -34,11 +34,12 @@ jobs:
 
             # - name: Lint code
             #   run: npm run lint
-            - name: List dist contents
-              run: ls -l dist
 
             - name: Build project
               run: npm run build
+
+            - name: List dist contents
+              run: ls -l dist
 
             - name: Setup Pages
               uses: actions/configure-pages@v4
