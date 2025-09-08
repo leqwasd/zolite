@@ -34,6 +34,8 @@ jobs:
 
             # - name: Lint code
             #   run: npm run lint
+            - name: List dist contents
+              run: ls -l dist
 
             - name: Build project
               run: npm run build
