@@ -38,6 +38,9 @@ jobs:
             - name: Build project
               run: npm run build
 
+            - name: Copy sitemap to dist
+              run: cp public/sitemap.xml dist/
+
             - name: List dist contents
               run: ls -l dist
 
